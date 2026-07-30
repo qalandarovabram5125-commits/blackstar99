@@ -17,9 +17,7 @@ export default function AdminNews() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin_news"],
     queryFn: async () => {
-      const { data, error } = await await api.list("news", "order=published_at");
-      if (error) throw error;
-      return data ?? [];
+      return await api.list("news", "order=published_at&dir=desc") ?? [];
     },
   });
 

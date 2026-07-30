@@ -30,13 +30,13 @@ db.exec(`
 
   CREATE TABLE IF NOT EXISTS site_settings (
     id INTEGER PRIMARY KEY DEFAULT 1 CHECK(id=1),
-    school_name TEXT DEFAULT '41-maktab',
+    school_name TEXT DEFAULT '51-maktab',
     motto TEXT DEFAULT 'Bilim — kelajak kaliti',
     hero_image_url TEXT,
     logo_url TEXT,
     address TEXT DEFAULT 'Toshkent shahri',
     phone TEXT DEFAULT '+998 71 000 00 00',
-    email TEXT DEFAULT 'info@41maktab.uz',
+    email TEXT DEFAULT 'info@51maktab.uz',
     latitude REAL DEFAULT 41.2995,
     longitude REAL DEFAULT 69.2401,
     stat_students INTEGER DEFAULT 1240,
@@ -194,7 +194,7 @@ if (seedNews.c === 0) {
   const insertSched = db.prepare("INSERT INTO schedule_entries VALUES (?,?,?,?,?,?,?,?,?,?,?)");
 
   const tx = db.transaction(() => {
-    insertNews.run(uuid(), "Yangi o'quv yili boshlandi", "2025–2026 o'quv yili tantanali ochildi", "41-maktabda yangi o'quv yili boshlandi!", null, null, now, now, now);
+    insertNews.run(uuid(), "Yangi o'quv yili boshlandi", "2025–2026 o'quv yili tantanali ochildi", "51-maktabda yangi o'quv yili boshlandi!", null, null, now, now, now);
     insertNews.run(uuid(), "Matematika olimpiadasi g'oliblari", "3 ta oltin medal", "O'quvchilar shahar olimpiadasida 3 oltin va 2 kumush medal oldi.", null, null, now, now, now);
     insertNews.run(uuid(), "Kitobxonlik tanlovi yakunlari", "Mart oyi natijalari", "10-sinflar g'olib bo'ldi.", null, null, now, now, now);
 

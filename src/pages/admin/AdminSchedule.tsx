@@ -20,7 +20,7 @@ export default function AdminSchedule() {
   const [classFilter, setClassFilter] = useState("");
   const { data, isLoading } = useQuery({
     queryKey: ["admin_schedule"],
-    queryFn: async () => (await api.from("schedule_entries").select("*").order("class_name").order("day_of_week").order("period_no")).data ?? [],
+    queryFn: async () => (await api.from("schedule").select("*").order("class_name",{ascending:true})).data ?? [],
   });
   const classes = useMemo(() => Array.from(new Set((data ?? []).map((r: any) => r.class_name))).sort(), [data]);
   const filtered = useMemo(() => (data ?? []).filter((r: any) => !classFilter || r.class_name === classFilter), [data, classFilter]);
@@ -34,8 +34,8 @@ export default function AdminSchedule() {
       start_time: editing.start_time, end_time: editing.end_time,
     };
     const res = editing.id
-      ? await api.from("schedule_entries").update(payload).eq("id", editing.id)
-      : await api.from("schedule_entries").insert(payload);
+      ? await api.from("schedule").update(payload).eq("id", editing.id)
+      : await api.from("schedule").insert(payload);
     setBusy(false);
     if (res.error) return toast.error(res.error.message);
     setEditing(null); toast.success("Saqlandi");
@@ -43,7 +43,7 @@ export default function AdminSchedule() {
   }
   async function del(id: string) {
     if (!confirm("O'chirilsinmi?")) return;
-    const { error } = await api.from("schedule_entries").delete().eq("id", id);
+    const { error } = await api.from("schedule").delete().eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin_schedule"] });
   }

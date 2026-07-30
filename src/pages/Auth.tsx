@@ -105,7 +105,10 @@ export default function Auth() {
             <Field icon={UserIcon} value={fullName} onChange={setFullName} placeholder="To'liq ism" required />
           )}
           <Field icon={Mail} type="email" value={email} onChange={setEmail} placeholder="E-pochta" required />
-          <Field icon={Lock} type="password" value={password} onChange={setPassword} placeholder="Parol" required minLength={6} />
+          <Field icon={Lock} type="password" value={password} onChange={setPassword} placeholder="Parol" required minLength={8} />
+          {mode === "signup" && (
+            <p className="text-xs text-muted-foreground -mt-1">Kamida 8 belgi, harf va raqam aralash</p>
+          )}
           <button
             type="submit"
             disabled={busy}

@@ -12,8 +12,8 @@ export default function AdminSettings() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await api.from("site_settings").select("*").eq("id", 1).maybeSingle();
-      setS(data ?? {
+      const settings = await api.getSiteSettings();
+      setS(settings ?? {
         id: 1, school_name: "51-maktab", motto: "", hero_image_url: "",
         phone: "", email: "", address: "", latitude: null, longitude: null,
         stat_students: 0, stat_teachers: 0, stat_workers: 0, stat_university_pct: 0,
@@ -24,10 +24,13 @@ export default function AdminSettings() {
   async function save() {
     if (!s) return;
     setBusy(true);
-    const { error } = await api.from("site_settings").upsert({ ...s, id: 1 });
+    try {
+      await api.updateSiteSettings(s);
+      toast.success("Sozlamalar saqlandi");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
     setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("Sozlamalar saqlandi");
   }
 
   if (!s) return <div className="p-8 text-center text-muted-foreground">Yuklanmoqda…</div>;

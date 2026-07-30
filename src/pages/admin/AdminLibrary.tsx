@@ -25,9 +25,7 @@ export default function AdminLibrary() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin_library"],
     queryFn: async () => {
-      const { data, error } = await await api.list("library_books", "order=created_at");
-      if (error) throw error;
-      return data ?? [];
+      return await api.list("library", "order=created_at&dir=desc") ?? [];
     },
   });
 
@@ -49,8 +47,8 @@ export default function AdminLibrary() {
     };
     if (!editing.id) payload.uploader_id = user?.id ?? null;
     const res = editing.id
-      ? await api.from("library_books").update(payload).eq("id", editing.id)
-      : await api.from("library_books").insert(payload);
+      ? await api.from("library").update(payload).eq("id", editing.id)
+      : await api.from("library").insert(payload);
     setBusy(false);
     if (res.error) return toast.error(res.error.message);
     toast.success("Saqlandi");
@@ -60,7 +58,7 @@ export default function AdminLibrary() {
 
   async function del(id: string) {
     if (!confirm("O'chirishni tasdiqlaysizmi?")) return;
-    const { error } = await api.from("library_books").delete().eq("id", id);
+    const { error } = await api.from("library").delete().eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin_library"] });
   }

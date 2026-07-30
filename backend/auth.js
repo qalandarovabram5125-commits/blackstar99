@@ -13,7 +13,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 function validatePassword(password) {
   const errors = [];
   if (password.length < 8) errors.push("Kamida 8 belgi");
-  if (!/[A-Z]/.test(password)) errors.push("Kamida 1 katta harf");
+  if (!/[a-zA-Z]/.test(password)) errors.push("Kamida 1 harf");
   if (!/[0-9]/.test(password)) errors.push("Kamida 1 raqam");
   return errors;
 }

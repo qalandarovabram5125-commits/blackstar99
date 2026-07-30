@@ -16,10 +16,9 @@ const CARDS = [
   { table: "news", label: "Yangiliklar", icon: Newspaper },
   { table: "events", label: "Tadbirlar", icon: CalendarDays },
   { table: "certificates", label: "Sertifikatlar", icon: Award },
-  { table: "gallery_items", label: "Galereya", icon: ImageIcon },
-  { table: "proud_students", label: "Faxrimiz", icon: Trophy },
-  { table: "schedule_entries", label: "Jadval", icon: GraduationCap },
-  { table: "profiles", label: "Foydalanuvchilar", icon: Users },
+  { table: "gallery", label: "Galereya", icon: ImageIcon },
+  { table: "proud", label: "Faxrimiz", icon: Trophy },
+  { table: "schedule", label: "Jadval", icon: GraduationCap },
 ];
 
 export default function AdminDashboard() {

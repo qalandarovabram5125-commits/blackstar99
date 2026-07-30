@@ -44,7 +44,7 @@ authRoutes(app);
 // ── Helpers ────────────────────────────────────────────────────────────
 function crudRoutes(prefix, table, options = {}) {
   const { adminWrite = true, allowedRoles = ["admin", "superadmin"], extraFields = {} } = options;
-  const validCols = new Set(Object.keys(db.prepare(`SELECT * FROM ${table} LIMIT 0`).columns().map(c => c.name)));
+  const validCols = new Set(db.prepare(`SELECT * FROM ${table} LIMIT 0`).columns().map(c => c.name));
   validCols.add("created_at"); validCols.add("updated_at"); validCols.add("published_at");
 
   const sanitizeOrder = (col, dir) => {
@@ -81,7 +81,7 @@ function crudRoutes(prefix, table, options = {}) {
     app.post(`/api/${prefix}`, authMiddleware, requireRole(...allowedRoles), (req, res) => {
       try {
         const id = uuid();
-        const allowedKeys = new Set(Object.keys(db.prepare(`SELECT * FROM ${table} LIMIT 0`).columns().map(c => c.name)));
+        const allowedKeys = new Set(db.prepare(`SELECT * FROM ${table} LIMIT 0`).columns().map(c => c.name));
         const data = { id, ...extraFields };
         for (const [k, v] of Object.entries(req.body)) {
           if (allowedKeys.has(k)) data[k] = v;
@@ -100,7 +100,7 @@ function crudRoutes(prefix, table, options = {}) {
     // Update - with column validation
     app.put(`/api/${prefix}/:id`, authMiddleware, requireRole(...allowedRoles), (req, res) => {
       try {
-        const allowedKeys = new Set(Object.keys(db.prepare(`SELECT * FROM ${table} LIMIT 0`).columns().map(c => c.name)));
+        const allowedKeys = new Set(db.prepare(`SELECT * FROM ${table} LIMIT 0`).columns().map(c => c.name));
         const filtered = {};
         for (const [k, v] of Object.entries(req.body)) {
           if (allowedKeys.has(k)) filtered[k] = v;

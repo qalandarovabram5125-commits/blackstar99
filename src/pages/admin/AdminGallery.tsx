@@ -14,11 +14,11 @@ export default function AdminGallery() {
   const [busy, setBusy] = useState(false);
   const { data, isLoading } = useQuery({
     queryKey: ["admin_gallery"],
-    queryFn: async () => (await api.from("gallery_items").select("*").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await api.from("gallery").select("*").order("created_at", { ascending: false })).data ?? [],
   });
   async function add() {
     setBusy(true);
-    const { error } = await api.from("gallery_items").insert({ image_url, caption: caption || null });
+    const { error } = await api.from("gallery").insert({ image_url, caption: caption || null });
     setBusy(false);
     if (error) return toast.error(error.message);
     setAdding(false); setImage(""); setCaption(""); toast.success("Qo'shildi");
@@ -26,7 +26,7 @@ export default function AdminGallery() {
   }
   async function del(id: string) {
     if (!confirm("O'chirilsinmi?")) return;
-    const { error } = await api.from("gallery_items").delete().eq("id", id);
+    const { error } = await api.from("gallery").delete().eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin_gallery"] });
   }

@@ -31,6 +31,7 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminAudit from "./pages/admin/AdminAudit";
+import { FaviconManager } from "@/components/FaviconManager";
 import Chat from "./pages/Chat";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <FaviconManager />
           <Routes>
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Index />} />

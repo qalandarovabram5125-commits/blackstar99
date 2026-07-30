@@ -30,18 +30,21 @@ export const api = {
   async login(email: string, password: string) {
     const data = await req("POST", "/api/auth/login", { email, password });
     _user = data.user; _roles = data.roles;
+    if (data.token) localStorage.setItem("auth_token", data.token);
     return data;
   },
 
   async register(email: string, password: string, full_name: string) {
     const data = await req("POST", "/api/auth/register", { email, password, full_name });
     _user = data.user; _roles = data.roles;
+    if (data.token) localStorage.setItem("auth_token", data.token);
     return data;
   },
 
   async googleLogin(credential: string) {
     const data = await req("POST", "/api/auth/google", { credential });
     _user = data.user; _roles = data.roles;
+    if (data.token) localStorage.setItem("auth_token", data.token);
     return data;
   },
 
@@ -64,6 +67,7 @@ export const api = {
 
   async signOut() {
     _user = null; _roles = [];
+    localStorage.removeItem("auth_token");
     try { await req("POST", "/api/auth/logout"); } catch {}
   },
 
@@ -176,9 +180,9 @@ api.getMe().catch(() => {});
 (api as any).from = function(table: string) {
   return {
     select: (fields?: string) => {
-      let _limit = 0, _single = false, _orderCol = "", _orderDir = "desc", _eqCol = "", _eqVal: any, _ilikeCol = "", _ilikeVal = "", _neqCol = "", _neqVal: any, _count = false, _gteCol = "", _gteVal = "", _lteCol = "", _lteVal = "", _inCol = "", _inVals: any[] = [];
+      let _limit = 0, _single = false, _orders: {col:string, dir:string}[] = [], _eqCol = "", _eqVal: any, _ilikeCol = "", _ilikeVal = "", _neqCol = "", _neqVal: any, _count = false, _gteCol = "", _gteVal = "", _lteCol = "", _lteVal = "", _inCol = "", _inVals: any[] = [];
       const chain: any = {
-        order: (col: string, opts?: any) => { _orderCol = col; _orderDir = opts?.ascending ? "asc" : "desc"; return chain; },
+        order: (col: string, opts?: any) => { _orders.push({col, dir: opts?.ascending ? "asc" : "desc"}); return chain; },
         eq: (col: string, val: any) => { _eqCol = col; _eqVal = val; return chain; },
         ilike: (col: string, val: string) => { _ilikeCol = col; _ilikeVal = val; return chain; },
         neq: (col: string, val: any) => { _neqCol = col; _neqVal = val; return chain; },
@@ -188,7 +192,8 @@ api.getMe().catch(() => {});
         single: () => { _single = true; return chain; },
         limit: (n: number) => { _limit = n; return chain; },
         then: (resolve: any) => {
-          const query = _orderCol ? `order=${_orderCol}&dir=${_orderDir}${_limit ? `&limit=${_limit}` : ''}` : '';
+          const orderParts = _orders.map(o => `order=${o.col}&dir=${o.dir}`);
+          const query = orderParts.length ? orderParts.join('&') + (_limit ? `&limit=${_limit}` : '') : (_limit ? `limit=${_limit}` : '');
           api.list(table, query)
             .then((data: any[]) => {
               let result = data;

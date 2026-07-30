@@ -16,7 +16,7 @@ export default function AdminProud() {
   const [busy, setBusy] = useState(false);
   const { data, isLoading } = useQuery({
     queryKey: ["admin_proud"],
-    queryFn: async () => (await api.from("proud_students").select("*").order("sort_order").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await api.from("proud").select("*").order("sort_order",{ascending:true})).data ?? [],
   });
   async function save() {
     if (!editing) return;
@@ -29,8 +29,8 @@ export default function AdminProud() {
       sort_order: Number(editing.sort_order) || 0,
     };
     const res = editing.id
-      ? await api.from("proud_students").update(payload).eq("id", editing.id)
-      : await api.from("proud_students").insert(payload);
+      ? await api.from("proud").update(payload).eq("id", editing.id)
+      : await api.from("proud").insert(payload);
     setBusy(false);
     if (res.error) return toast.error(res.error.message);
     setEditing(null); toast.success("Saqlandi");
@@ -38,7 +38,7 @@ export default function AdminProud() {
   }
   async function del(id: string) {
     if (!confirm("O'chirilsinmi?")) return;
-    const { error } = await api.from("proud_students").delete().eq("id", id);
+    const { error } = await api.from("proud").delete().eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin_proud"] });
   }

@@ -4,8 +4,7 @@ import { Btn, Card, PageHeader } from "@/components/admin/ui";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoles } from "@/hooks/useRoles";
-import { Trash2, KeyRound, Mail } from "lucide-react";
-import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { fmtDateTime } from "@/lib/format";
 
 const ALL_ROLES = ["student", "teacher", "librarian", "vice_principal", "admin", "superadmin"] as const;
@@ -21,24 +20,8 @@ export default function AdminUsers() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin_users"],
     queryFn: async () => {
-      const [{ data: profiles }, { data: roles }, authRes] = await Promise.all([
-        api.from("profiles").select("*").order("created_at", { ascending: false }),
-        api.from("user_roles").select("*"),
-        api.functions.invoke("admin-users", { body: { action: "list" } }),
-      ]);
-      const byUser = new Map<string, string[]>();
-      (roles ?? []).forEach((r: any) => {
-        const arr = byUser.get(r.user_id) ?? [];
-        arr.push(r.role); byUser.set(r.user_id, arr);
-      });
-      const authMap = new Map<string, any>();
-      const authUsers = (authRes.data as any)?.users ?? [];
-      authUsers.forEach((u: any) => authMap.set(u.id, u));
-      return (profiles ?? []).map((p: any) => ({
-        ...p,
-        roles: byUser.get(p.id) ?? [],
-        auth: authMap.get(p.id) ?? null,
-      }));
+      const users = await api.getUsers();
+      return users ?? [];
     },
   });
 
@@ -46,41 +29,26 @@ export default function AdminUsers() {
     if (uid === user?.id && role === "superadmin" && has) {
       return toast.error("O'zingizdan superadmin rolini olib tashlay olmaysiz");
     }
-    const res = has
-      ? await api.from("user_roles").delete().eq("user_id", uid).eq("role", role as any)
-      : await api.from("user_roles").insert({ user_id: uid, role: role as any });
-    if (res.error) return toast.error(res.error.message);
-    qc.invalidateQueries({ queryKey: ["admin_users"] });
+    try {
+      await api.updateUserRole(uid, role, has ? "remove" : "add");
+      qc.invalidateQueries({ queryKey: ["admin_users"] });
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
   async function deleteUser(uid: string, name: string) {
     if (uid === user?.id) return toast.error("O'zingizni o'chira olmaysiz");
     if (!confirm(`"${name}" foydalanuvchini butunlay o'chirish?`)) return;
-    const { data, error } = await api.functions.invoke("admin-delete-user", { body: { user_id: uid } });
-    if (error || (data as any)?.error) return toast.error(error?.message ?? (data as any)?.error);
-    toast.success("O'chirildi");
-    qc.invalidateQueries({ queryKey: ["admin_users"] });
+    try {
+      await api.deleteUser(uid);
+      toast.success("O'chirildi");
+      qc.invalidateQueries({ queryKey: ["admin_users"] });
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
 
-  async function resetPassword(uid: string, email: string) {
-    const pwd = prompt(`"${email}" uchun yangi parol (min 6 belgi):`);
-    if (!pwd) return;
-    if (pwd.length < 6) return toast.error("Parol kamida 6 belgi");
-    const { data, error } = await api.functions.invoke("admin-users", {
-      body: { action: "set_password", user_id: uid, password: pwd },
-    });
-    if (error || (data as any)?.error) return toast.error(error?.message ?? (data as any)?.error);
-    toast.success("Parol yangilandi");
-  }
-  async function changeEmail(uid: string, current: string) {
-    const email = prompt("Yangi email:", current);
-    if (!email || email === current) return;
-    const { data, error } = await api.functions.invoke("admin-users", {
-      body: { action: "set_email", user_id: uid, email },
-    });
-    if (error || (data as any)?.error) return toast.error(error?.message ?? (data as any)?.error);
-    toast.success("Email yangilandi");
-    qc.invalidateQueries({ queryKey: ["admin_users"] });
-  }
+
 
   return (
     <div>
@@ -101,7 +69,7 @@ export default function AdminUsers() {
                   <div className="min-w-0">
                     <div className="font-medium truncate">{p.full_name || "Foydalanuvchi"}</div>
                     <div className="text-xs text-muted-foreground truncate">
-                      <span className="font-mono">{p.auth?.email ?? "—"}</span>
+                      <span className="font-mono">{p.email ?? "—"}</span>
                       {p.class_name ? ` · ${p.class_name}` : ""}
                     </div>
                     {p.auth?.last_sign_in_at && (
@@ -126,24 +94,6 @@ export default function AdminUsers() {
                       </Btn>
                     );
                   })}
-                  {isSuper && p.auth && (
-                    <>
-                      <button
-                        onClick={() => changeEmail(p.id, p.auth.email ?? "")}
-                        className="grid h-8 w-8 place-items-center rounded-lg hover:bg-secondary"
-                        title="Emailni o'zgartirish"
-                      >
-                        <Mail className="h-4 w-4"/>
-                      </button>
-                      <button
-                        onClick={() => resetPassword(p.id, p.auth.email ?? "")}
-                        className="grid h-8 w-8 place-items-center rounded-lg hover:bg-secondary"
-                        title="Parolni yangilash"
-                      >
-                        <KeyRound className="h-4 w-4"/>
-                      </button>
-                    </>
-                  )}
                   {isSuper && p.id !== user?.id && (
                     <button
                       onClick={() => deleteUser(p.id, p.full_name || "Foydalanuvchi")}

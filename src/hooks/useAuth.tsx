@@ -14,18 +14,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      api.getMe().then((data) => {
-        setUser(data?.user ?? null);
-        setLoading(false);
-      }).catch(() => {
-        setUser(null);
-        setLoading(false);
-      });
-    } else {
+    // Always try to restore session via httpOnly cookie or stored token
+    api.getMe().then((data) => {
+      setUser(data?.user ?? null);
       setLoading(false);
-    }
+    }).catch(() => {
+      setUser(null);
+      setLoading(false);
+    });
   }, []);
 
   return (
