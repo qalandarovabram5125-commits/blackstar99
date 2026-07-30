@@ -12,16 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Environment
-.env
-
-# Uploads
-backend/uploads/
-
-# Database runtime files
-data.db-shm
-data.db-wal
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
