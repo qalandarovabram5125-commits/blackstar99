@@ -56,12 +56,12 @@ CREATE POLICY "Superadmin manages roles" ON public.user_roles FOR ALL TO authent
 -- ============ SITE SETTINGS (single row) ============
 CREATE TABLE public.site_settings (
   id INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-  school_name TEXT NOT NULL DEFAULT '41-maktab',
+  school_name TEXT NOT NULL DEFAULT '51-maktab',
   motto TEXT NOT NULL DEFAULT 'Bilim — kelajak kaliti',
   hero_image_url TEXT,
   address TEXT DEFAULT 'Toshkent shahri',
   phone TEXT DEFAULT '+998 71 000 00 00',
-  email TEXT DEFAULT 'info@41maktab.uz',
+  email TEXT DEFAULT 'info@51maktab.uz',
   latitude DOUBLE PRECISION DEFAULT 41.2995,
   longitude DOUBLE PRECISION DEFAULT 69.2401,
   stat_students INT NOT NULL DEFAULT 1240,
@@ -263,7 +263,7 @@ CREATE POLICY "Admins manage proud" ON public.proud_students FOR ALL TO authenti
 
 -- ============ SEED DEMO DATA ============
 INSERT INTO public.news (title, excerpt, content, cover_url) VALUES
-('Yangi o''quv yili boshlandi','2025–2026 o''quv yili tantanali ochildi','41-maktabda yangi o''quv yili tantanali marosim bilan ochildi. Barcha o''quvchilar va o''qituvchilarni qutlaymiz!', null),
+('Yangi o''quv yili boshlandi','2025–2026 o''quv yili tantanali ochildi','51-maktabda yangi o''quv yili tantanali marosim bilan ochildi. Barcha o''quvchilar va o''qituvchilarni qutlaymiz!', null),
 ('Matematika olimpiadasi g''oliblari','Shahar bosqichida 3 ta oltin medal','O''quvchilarimiz shahar matematika olimpiadasida 3 oltin va 2 kumush medalni qo''lga kiritdi.', null),
 ('Kitobxonlik tanlovi','Mart oyi yakunlari','Mart oyi davomida o''tkazilgan kitobxonlik tanlovida 10-sinflar g''olib bo''ldi.', null);
 
@@ -575,7 +575,7 @@ WITH CHECK (has_any_role(auth.uid(), ARRAY['admin'::app_role,'superadmin'::app_r
 
 -- Ensure row id=1 exists so update path works too
 INSERT INTO public.site_settings (id, school_name, motto)
-VALUES (1, '41-maktab', 'Bilim — kelajak kaliti')
+VALUES (1, '51-maktab', 'Bilim — kelajak kaliti')
 ON CONFLICT (id) DO NOTHING;
 
 CREATE POLICY "Media public read" ON storage.objects
